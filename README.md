@@ -17,7 +17,7 @@
 
 A seal that lives in your terminal. Inspired by cowsay!
 
-## Install
+## Dependencies
 
 **Requires Python3**
 
@@ -36,7 +36,15 @@ $ pacman -S python3
 $ brew install python
 ```
 
-### Manual
+## Package managers
+
+### AUR (Arch Linux)
+
+```bash
+yay -S sealsay
+```
+
+## Manual install
 
 1: Clone the repo:
 
@@ -52,10 +60,6 @@ $ chmod +x sealsay
 
 # Linux / macOS:
 $ sudo mv sealsay /usr/local/bin/sealsay
-
-# Windows (MSYS2):
-$ mv sealsay /usr/bin/sealsay
-# Note that this program will only work through the MSYS2 terminal
 ```
 
 After running the mv command, it is safe to delete the remains of the repo

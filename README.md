@@ -27,13 +27,13 @@ OR
 
 ```bash
 # apt (Debian / Ubuntu)
-$ sudo apt install python
+sudo apt install python
 
 # pacman (Arch)
-$ pacman -S python3
+pacman -S python3
 
 # Homebrew (Linux / MacOS)
-$ brew install python
+brew install python
 ```
 
 ## Package managers
@@ -49,17 +49,17 @@ yay -S sealsay
 1: Clone the repo:
 
 ```bash
-$ git clone https://github.com/phantypengy/sealsay
-$ cd sealsay
+git clone https://github.com/phantypengy/sealsay
+cd sealsay
 ```
 
 2: Make script executable & add it to PATH:
 
 ```bash
-$ chmod +x sealsay
+chmod +x sealsay
 
 # Linux / macOS:
-$ sudo mv sealsay /usr/local/bin/sealsay
+sudo mv sealsay /usr/local/bin/sealsay
 ```
 
 After running the mv command, it is safe to delete the remains of the repo

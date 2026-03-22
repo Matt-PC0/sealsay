@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+import sys
+import textwrap
+
+def printSeal(usrInput):
+    lines = textwrap.wrap(usrInput, width=40)
+    width = max(len(l) for l in lines)
+    border = "-" * (width + 4)
+    
+    
+    bubble = f"{border}\n"
+    for line in lines:
+        bubble += f"    <  {line}  >\n"
+    bubble += f"     {border}"
+
+    print(rf""" 
+     {bubble}
+       \ 
+        \                             ---\/---                           
+         \      ------                \  || /                    
+          \    .  .  /\ -----------\   \   /                                 
+           \  *     /               \  /  /                     
+            - (--)                   \/  /                       
+               \      | \               /                    
+                -------\ \-------------/                                                    
+                        \ |                                                                                                                                                                           
+      """)
+    
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        usrInput = " ".join(sys.argv[1:])
+        printSeal(usrInput)
+    else:
+        print("Invalid use! Please provide a message for the seal to say.")

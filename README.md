@@ -64,7 +64,7 @@ sudo mv sealsay /usr/local/bin/sealsay
 
 3: Move seals/ directory to /usr/share:
 
-```bash
+````bash
 # Linux
 mv seals/ /usr/share/seals/
 
@@ -75,10 +75,10 @@ After running the mv command, it is safe to delete the remains of the repo
 
 ## Usage
 
-Same format as cowsay:
+``sealsay [-modifier] [message]``
 
 ```bash
-$ sealsay seals are the best!
+$ sealsay -s seals are the best!
 
 
      -----------------------
@@ -93,4 +93,4 @@ $ sealsay seals are the best!
                \      | \               /
                 -------\ \-------------/
                         \ |
-```
+````

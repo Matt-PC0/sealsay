@@ -75,7 +75,7 @@ After running the mv command, it is safe to delete the remains of the repo
 
 ## Usage
 
-``sealsay [-modifier] [message]``
+sealsay [-modifier] [message]
 
 ```bash
 $ sealsay -s seals are the best!

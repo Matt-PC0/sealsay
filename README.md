@@ -62,6 +62,15 @@ chmod +x sealsay
 sudo mv sealsay /usr/local/bin/sealsay
 ```
 
+3: Move seals/ directory to /usr/share:
+
+```bash
+# Linux
+mv seals/ /usr/share/seals/
+
+# macOS
+mv seals/ /usr/local/share/seals/
+
 After running the mv command, it is safe to delete the remains of the repo
 
 ## Usage

@@ -48,11 +48,12 @@ def build_parser():
         description="CLI app that generates ASCII art of a seal saying a message",
         formatter_class=argparse.RawDescriptionHelpFormatter, # turns off text wrapping in epilog
         epilog=("e.g usage:\n"
-                "   sealsay -s 'Hello, world!' # uses the 'basic' seal\n"
-                "   sealsay -r Hi              # chooses a random seal") # ^ same length text ugh so hot and sexy
+                f"{"":<{3}}sealsay -s 'Hello, world!' # uses the 'basic' seal\n"
+                f"{"":<{3}}sealsay -r Hi              # chooses a random seal") # ^ same length text ugh so hot and sexy
 
     )
     p.add_argument("message", nargs="*", help="text for the seal to say")
+    p.add_argument("-l", "--list", action="store_true", help="lists all seals")
     p.add_argument("-r", "--random", action="store_true", help="pick a random seal to display your message")
     
     seals = p.add_argument_group("seals")
@@ -68,6 +69,10 @@ def build_parser():
 def main():
     parser = build_parser()
     args = parser.parse_args()
+    
+    if args.list:
+        list_seals()
+        return
     
     if args.random:
         args.seal = random.choice(list(SEALS.keys()))
@@ -90,6 +95,15 @@ def read_stdin():
     except (OSError, UnicodeDecodeError) as e:
         print(f"Error when reading from stdin: {e}", file=sys.stderr)
         sys.exit(EXIT_IO_ERROR)
+
+def list_seals():
+    if not SEALS:
+        print(f"No seals found in {filePath}", file=sys.stderr)
+        sys.exit(EXIT_NOT_FOUND)
+    
+    print("Available seals:")
+    for flag in sorted(SEALS):
+        print(f"{"":<{3}}{flag} {Path(SEALS[flag]).stem}")
 
 def printSeal(usrInput, sealArt):
     usrInput = usrInput or ""

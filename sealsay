@@ -169,7 +169,7 @@ def printSeal(message, sealArt, no_wrap=False, wrap=40, bold=False, rainbow=Fals
     lines = []
     for paragraph in message.split("\n"):
         if no_wrap:
-            lines.extend(paragraph)
+            lines.append(paragraph)
         else:
             lines.extend(textwrap.wrap(paragraph, width=wrap) or [""]) 
     

@@ -5,6 +5,7 @@ import signal
 import sys
 import textwrap
 import platform
+import argparse
 from pathlib import Path
 
 # the magic numbers in sys.exit were pmo AND os.EX_* stuff isnt cross-platform, so stupid
@@ -41,29 +42,37 @@ def _build_seal_map():
 
 SEALS = _build_seal_map()
 
+def build_parser():
+    p = argparse.ArgumentParser(
+        prog="sealsay",
+        description="CLI app that generates ASCII art of a seal saying a message",
+        epilog="e.g usage: sealsay -s 'Hello, world!'"
+    )
+    p.add_argument("message", nargs="*", help="text for the seal to say")
+    
+    seals = p.add_argument_group("seals")
+    seal_choice = seals.add_mutually_exclusive_group(required=bool(SEALS))
+    for flag in sorted(SEALS):
+        name = Path(SEALS[flag]).stem
+        seal_choice.add_argument(flag, f"--{name}", dest="seal", action="store_const", const=flag, help=f"{name} seal")
+    
+    seal_choice.add_argument("-s", "--say", dest="seal", action="store_const", const="-o", help="Says something with the og seal")
+    
+    return p
+
 def main():
-    if len(sys.argv) < 2:
-        print(help_msg(), file=sys.stderr)
-        sys.exit(EXIT_USAGE)
-        
-    sealVar = sys.argv[1]
-    usrInput = " ".join(sys.argv[2:])
+    args = build_parser().parse_args()
     
-    # stdin piping
-    if not usrInput and not sys.stdin.isatty():
-        usrInput = read_stdin()
+    message = " ".join(args.message)
+    if not message and not sys.stdin.isatty():
+        message = read_stdin()
     
-    if sealVar == "-h":
-        print(help_msg())
-        return
-    
-    
-    sealArt = selectSeal(sealVar)
+    sealArt = selectSeal(args.seal)
     if sealArt is None:
         print(f'Error: unknown opt "{sealVar}", use sealsay -h for usage.', file=sys.stderr)
-        sys.exit(EXIT_USAGE)
+        sys.exit(EXIT_INVALID_SEAL)
         
-    printSeal(usrInput, sealArt)
+    printSeal(message, sealArt)
     
 def read_stdin():
     try: 

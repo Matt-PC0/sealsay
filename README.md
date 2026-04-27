@@ -102,11 +102,14 @@ $ sealsay -s seals are the best!
 
 ### Seal variants:
 
--s: original seal
+<!-- SEALS:START -->
+-b: basic seal
+
+-o: old seal
 
 -t: triple seal
 
--o: basic seal
+<!-- SEALS:END -->
 
 _-t and -o were taken from ASCII.co.uk_
 

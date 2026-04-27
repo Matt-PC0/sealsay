@@ -1,0 +1,36 @@
+name: Update README.md with seals when a new one is pushed
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "seals/**"
+      - "scripts/autoupdate_seals_readme.py"
+      - ".github/workflows/autoupdate-seals-readme.yml"
+
+concurrency:
+  group: autoupdate-seals-readme
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+
+      - name: set up py
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: regen README seals
+        run: python scripts/autoupdate_seals_readme.py
+
+      - name: commit & push if changed
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "docs: update seals list in README.md"

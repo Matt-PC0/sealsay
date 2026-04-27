@@ -64,6 +64,7 @@ def build_parser():
     p.add_argument("-l", "--list", action="store_true", help="lists all seals")
     p.add_argument("-r", "--random", action="store_true", help="pick a random seal to display your message")
     p.add_argument("-n", "--no-wrap", action="store_true", help="disable text wrapping")
+    p.add_argument("-w", "--wrap", type=int, default=40, metavar="int", help="wrap column after a given amount of chars (default = 40)")
     
     appearance = p.add_argument_group("appearance")
     appearance.add_argument("-B", "--bold", action="store_true", help="makes bubble text bolded")
@@ -100,7 +101,7 @@ def main():
         parser.error(f'please provide something so we can make seal instead of "{args.seal}"')
         sys.exit(EXIT_INVALID_SEAL)
         
-    printSeal(message=message, sealArt=sealArt, no_wrap=args.no_wrap, bold=args.bold, rainbow=args.rainbow, aurora=args.aurora)
+    printSeal(message=message, sealArt=sealArt, no_wrap=args.no_wrap, wrap=args.wrap, bold=args.bold, rainbow=args.rainbow, aurora=args.aurora)
     
 def read_stdin():
     try: 
@@ -162,7 +163,7 @@ def aurora_print(text, bold=False, start=0):
         bold=bold
     )
 
-def printSeal(message, sealArt, no_wrap=False, bold=False, rainbow=False, aurora=False):
+def printSeal(message, sealArt, no_wrap=False, wrap=40, bold=False, rainbow=False, aurora=False):
     message = message or ""
     
     lines = []
@@ -170,7 +171,7 @@ def printSeal(message, sealArt, no_wrap=False, bold=False, rainbow=False, aurora
         if no_wrap:
             lines.extend(paragraph)
         else:
-            lines.extend(textwrap.wrap(paragraph, width=40) or [""]) 
+            lines.extend(textwrap.wrap(paragraph, width=wrap) or [""]) 
     
     width = max(len(l) for l in lines)
     

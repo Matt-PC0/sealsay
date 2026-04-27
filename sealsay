@@ -1,9 +1,22 @@
 #!/usr/bin/env python3
 
+import os
+import signal
 import sys
 import textwrap
 import platform
 from pathlib import Path
+
+# the magic numbers in sys.exit were pmo AND os.EX_* stuff isnt cross-platform, so stupid
+EXIT_OK             = 0
+EXIT_ERROR          = 1
+EXIT_USAGE          = 2
+EXIT_NOT_FOUND      = 3
+EXIT_INVALID_SEAL   = 4
+EXIT_IO_ERROR       = 5
+EXIT_CONFIG_ERROR   = 6
+EXIT_INTERRUPTED    = 130 # (128 + SIGINT is how unix does it)
+EXIT_BROKEN_PIPE    = 141 # (128 + SIGPIPE is also how unix does it lol)
 
 filePath = "seals/"
 if (platform.system() == "Linux"):
@@ -31,10 +44,14 @@ SEALS = _build_seal_map()
 def main():
     if len(sys.argv) < 2:
         print(help_msg(), file=sys.stderr)
-        sys.exit(1)
+        sys.exit(EXIT_OK)
         
     sealVar = sys.argv[1]
     usrInput = " ".join(sys.argv[2:])
+    
+    # stdin piping
+    if not usrInput and not sys.stdin.isatty():
+        usrInput = read_stdin()
     
     if sealVar == "-h":
         print(help_msg())
@@ -44,8 +61,17 @@ def main():
     sealArt = selectSeal(sealVar)
     if sealArt is None:
         print(f'Error: unknown opt "{sealVar}", use sealsay -h for usage.', file=sys.stderr)
+        sys.exit(EXIT_INVALID_SEAL)
         
     printSeal(usrInput, sealArt)
+    
+def read_stdin():
+    try: 
+        return sys.stdin.read().rstrip("\n")
+    except KeyboardInterrupt:
+        sys.exit(EXIT_INTERRUPTED)
+    except (OSError, UnicodeDecodeError) as e:
+        print(f"Error when reading from stdin: {e}", file=sys.stderr)
       
 # ts kinda ugly      
 def help_msg():
@@ -116,6 +142,6 @@ def selectSeal(sealVar):
             return f.read()
     except FileNotFoundError:
         print(f"Error: seal file not found: {path}", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(EXIT_INVALID_SEAL)
 
 if __name__ == "__main__": main()

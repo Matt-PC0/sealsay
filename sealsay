@@ -4,6 +4,7 @@ from pathlib import Path
 import textwrap
 import platform
 import random
+import math
 import sys
 
 import argparse
@@ -18,6 +19,13 @@ EXIT_IO_ERROR       = 5
 EXIT_CONFIG_ERROR   = 6
 EXIT_INTERRUPTED    = 130 # (128 + SIGINT is how unix does it)
 EXIT_BROKEN_PIPE    = 141 # (128 + SIGPIPE is also how unix does it lol)
+
+# https://github.com/Code-Hex/Neo-cowsay/blob/f68c20f068c26c55bc5a8572f1c582f0a1b08d34/decoration/rainbow.go
+# Thank you, Neo-cosway (the aurora and rainbow logic is entirely stolen)
+# 
+RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN = 31, 32, 33, 34, 35, 36
+RAINBOW_COLORS = [RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN]
+RAINBOW_FREQ   = 0.1
 
 filePath = "seals/"
 if (platform.system() == "Linux"):
@@ -59,6 +67,9 @@ def build_parser():
     
     appearance = p.add_argument_group("appearance")
     appearance.add_argument("-B", "--bold", action="store_true", help="makes bubble text bolded")
+    appearance.add_argument("-R", "--rainbow", action="store_true", help="makes bubble text rainbow")
+    appearance.add_argument("-A", "--aurora", action="store_true", help="makes bubble text aurora'd")
+
     
     seals = p.add_argument_group("seals")
     seal_choice = seals.add_mutually_exclusive_group(required=False)
@@ -89,7 +100,7 @@ def main():
         parser.error(f'please provide something so we can make seal instead of "{args.seal}"')
         sys.exit(EXIT_INVALID_SEAL)
         
-    printSeal(message=message, sealArt=sealArt, no_wrap=args.no_wrap, bold=args.bold)
+    printSeal(message=message, sealArt=sealArt, no_wrap=args.no_wrap, bold=args.bold, rainbow=args.rainbow, aurora=args.aurora)
     
 def read_stdin():
     try: 
@@ -108,8 +119,50 @@ def list_seals():
     print("Available seals:")
     for flag in sorted(SEALS):
         print(f"{"":<{3}}{flag} {Path(SEALS[flag]).stem}")
+    
+# helper to dedupe the colorizers 
+def _colorize(text, color_for, bold=False, reset_on_nl=False):
+    attr = ";1" if bold else ""
+    buf = []
+    i = 0
+    
+    for ch in text:
+        if ch == "\n":
+            if reset_on_nl:
+                i = 0
+                
+            buf.append(ch)
+            continue
+        
+        buf.append(f"\x1b[{color_for(i)}{attr}m{ch}\x1b[0m")
+        i += 1
+    
+    return "".join(buf)
 
-def printSeal(message, sealArt, no_wrap=False, bold=False):
+# this is such a shit function but idc
+def _aurora_index(i):
+    r = int(6 * ((math.sin(RAINBOW_FREQ * i + 0) * 127 + 128)                / 256)) * 36
+    g = int(6 * ((math.sin(RAINBOW_FREQ * i + 2  * (math.pi/3)) * 127 + 128) / 256)) * 6
+    b = int(6 * ((math.sin(RAINBOW_FREQ * i + 4  * (math.pi/3)) * 127 + 128) / 256)) * 1
+    
+    return 16 + r + g + b
+        
+def rainbow_print(text, bold=False):
+    return _colorize(
+        text,
+        color_for=lambda i: str(RAINBOW_COLORS[i % 6]),
+        bold=bold,
+        reset_on_nl=True
+    )
+
+def aurora_print(text, bold=False, start=0):
+    return _colorize(
+        text,
+        color_for=lambda i: f"38;5;{_aurora_index(i)}",
+        bold=bold
+    )
+
+def printSeal(message, sealArt, no_wrap=False, bold=False, rainbow=False, aurora=False):
     message = message or ""
     
     lines = []
@@ -157,8 +210,12 @@ def printSeal(message, sealArt, no_wrap=False, bold=False):
         body = "\n".join(body_lines)
         
     output = f"{top}\n{body}\n{bottom}\n{sealArt}"
-    if bold:
-        print(f"bold is {bold}", file=sys.stderr)
+    
+    if rainbow:
+        output = rainbow_print(output, bold=bold)
+    elif aurora:
+        output = aurora_print(output, bold=bold)
+    elif bold:
         output = f"\x1b[1m{output}\x1b[0m"
 
     print(output)

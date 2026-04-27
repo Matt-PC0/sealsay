@@ -55,6 +55,7 @@ def build_parser():
     p.add_argument("message", nargs="*", help="text for the seal to say")
     p.add_argument("-l", "--list", action="store_true", help="lists all seals")
     p.add_argument("-r", "--random", action="store_true", help="pick a random seal to display your message")
+    p.add_argument("-n", "--no-wrap", action="store_true", help="disable text wrapping")
     
     seals = p.add_argument_group("seals")
     seal_choice = seals.add_mutually_exclusive_group(required=False)
@@ -85,7 +86,7 @@ def main():
         parser.error(f'please provide something so we can make seal instead of "{args.seal}"')
         sys.exit(EXIT_INVALID_SEAL)
         
-    printSeal(message, sealArt)
+    printSeal(message=message, sealArt=sealArt, no_wrap=args.no_wrap)
     
 def read_stdin():
     try: 
@@ -105,12 +106,15 @@ def list_seals():
     for flag in sorted(SEALS):
         print(f"{"":<{3}}{flag} {Path(SEALS[flag]).stem}")
 
-def printSeal(usrInput, sealArt):
-    usrInput = usrInput or ""
+def printSeal(message, sealArt, no_wrap=False):
+    message = message or ""
     
     lines = []
-    for paragraph in usrInput.split("\n"):
-        lines.extend(textwrap.wrap(paragraph, width=40) or [""])
+    for paragraph in message.split("\n"):
+        if no_wrap:
+            lines.extend(paragraph)
+        else:
+            lines.extend(textwrap.wrap(paragraph, width=40) or [""])
     
     width = max(len(l) for l in lines)
     

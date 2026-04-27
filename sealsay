@@ -35,7 +35,7 @@ else:
 # could make them use more chars sequentially till it finds a unique flag
 def _build_seal_map():
     if not filePath.is_dir():
-        return {}
+        sys.exit(EXIT_CONFIG_ERROR)
     
     return {f"-{p.stem[0]}": p.name for p in sorted(filePath.glob("*.txt"))}
 
@@ -44,7 +44,7 @@ SEALS = _build_seal_map()
 def main():
     if len(sys.argv) < 2:
         print(help_msg(), file=sys.stderr)
-        sys.exit(EXIT_OK)
+        sys.exit(EXIT_USAGE)
         
     sealVar = sys.argv[1]
     usrInput = " ".join(sys.argv[2:])
@@ -61,7 +61,7 @@ def main():
     sealArt = selectSeal(sealVar)
     if sealArt is None:
         print(f'Error: unknown opt "{sealVar}", use sealsay -h for usage.', file=sys.stderr)
-        sys.exit(EXIT_INVALID_SEAL)
+        sys.exit(EXIT_USAGE)
         
     printSeal(usrInput, sealArt)
     
